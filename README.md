@@ -1,4 +1,4 @@
-# vue-ssg
+# vite-ssg
 
 一个简略版的 Vite 静态页面生成器。
 
