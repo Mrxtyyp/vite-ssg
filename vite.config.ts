@@ -15,7 +15,7 @@ export default defineConfig({
 
         VitePages({
             extensions: ['vue', 'md'],
-            pagesDir: 'pages',
+            pagesDir: 'src/pages',
             extendRoute(route) {
                 const path = resolve(__dirname, route.component.slice(1));
 
