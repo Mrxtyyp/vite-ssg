@@ -16,6 +16,7 @@ jobs:
   test:
     # 运行的基础
     runs-on: ubuntu-latest
+    environment: test
     # 步骤
     steps:
       - uses: actions/checkout@v3 # git pull
@@ -25,21 +26,22 @@ jobs:
           node-version: 14
       - name: 打包镜像, 上传 Docker Hub
         run: |
-          echo ${{ test.REGISTRY_PASSWORD }} | docker login -u ${{ test.REGISTRY_USERNAME }} --password-stdin
+          echo '${{ secrets.REGISTRY_PASSWORD }}'
+          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
           docker build --platform linux/amd64 -t vite-ssg:latest .
-          docker tag vite-ssg:latest ${{ test.DOCKER_REPOSITORY }}
-          docker push ${{ test.DOCKER_REPOSITORY }}
+          docker tag vite-ssg:latest ${{ secrets.DOCKER_REPOSITORY }}
+          docker push ${{ secrets.DOCKER_REPOSITORY }}
       - name: 登录服务器, 执行脚本
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ test.REMOTE_HOST }}
+          host: ${{ secrets.REMOTE_HOST }}
           username: root
-          password: ${{ test.REMOTE_PASSWORD }}
+          password: ${{ secrets.REMOTE_PASSWORD }}
           # 执行脚本
           script: |
-            docker pull ${{ test.DOCKER_REPOSITORY }}
+            docker pull ${{ secrets.DOCKER_REPOSITORY }}
             docker stop vite-ssg
             docker rm vite-ssg
-            docker run --name vite-ssg -d -p 9090:80 ${{ test.DOCKER_REPOSITORY }}
+            docker run --name vite-ssg -d -p 9090:80 ${{ secrets.DOCKER_REPOSITORY }}
             docker image prune -f --filter "until=24h"
             docker container prune -f --filter "until=24h"
