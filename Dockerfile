@@ -6,7 +6,7 @@ COPY . /app
 # 设置时区
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
 RUN npm set registry https://registry.npm.taobao.org
-RUN npm install && npm build
+RUN npm install && npm run build
 
 FROM nginx
 RUN mkdir /app
