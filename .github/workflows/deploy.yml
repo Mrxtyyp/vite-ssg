@@ -25,21 +25,21 @@ jobs:
           node-version: 14
       - name: 打包镜像, 上传 Docker Hub
         run: |
-          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+          echo ${{ test.REGISTRY_PASSWORD }} | docker login -u ${{ test.REGISTRY_USERNAME }} --password-stdin
           docker build --platform linux/amd64 -t vite-ssg:latest .
-          docker tag vite-ssg:latest ${{ secrets.DOCKER_REPOSITORY }}
-          docker push ${{ secrets.DOCKER_REPOSITORY }}
+          docker tag vite-ssg:latest ${{ test.DOCKER_REPOSITORY }}
+          docker push ${{ test.DOCKER_REPOSITORY }}
       - name: 登录服务器, 执行脚本
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.REMOTE_HOST }}
+          host: ${{ test.REMOTE_HOST }}
           username: root
-          password: ${{ secrets.REMOTE_PASSWORD }}
+          password: ${{ test.REMOTE_PASSWORD }}
           # 执行脚本
           script: |
-            docker pull ${{ secrets.DOCKER_REPOSITORY }}
+            docker pull ${{ test.DOCKER_REPOSITORY }}
             docker stop vite-ssg
             docker rm vite-ssg
-            docker run --name vite-ssg -d -p 9090:80 ${{ secrets.DOCKER_REPOSITORY }}
+            docker run --name vite-ssg -d -p 9090:80 ${{ test.DOCKER_REPOSITORY }}
             docker image prune -f --filter "until=24h"
             docker container prune -f --filter "until=24h"
